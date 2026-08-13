@@ -16,6 +16,7 @@ button.t9-step-label, button.t9-vcol-title {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  min-height: 100vh;
   padding: 40px 0;
   font-family: 'Geist Mono', ui-monospace, monospace;
   overflow: hidden;
