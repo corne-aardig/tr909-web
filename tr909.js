@@ -72,6 +72,18 @@
   let masterGain = null;
   let openHatVoices = [];       // ringing OH sources, choked by CH
   let loadPromise = null;
+  let rawPromise = null;        // sample bytes, prefetched before any user gesture
+
+  function prefetchSamples() {
+    if (rawPromise) return rawPromise;
+    rawPromise = Promise.all(VOICES.map(v =>
+      fetch(SAMPLE_BASE + 'samples/' + v.file)
+        .then(r => { if (!r.ok) throw new Error(v.file + ' HTTP ' + r.status); return r.arrayBuffer(); })
+        .then(ab => [v.id, ab])
+    ));
+    rawPromise.catch(() => {});   // surfaced later via ensureAudio
+    return rawPromise;
+  }
 
   function ensureAudio() {
     if (!ctx) {
@@ -79,11 +91,8 @@
       masterGain = ctx.createGain();
       masterGain.gain.value = knobs.volume;
       masterGain.connect(ctx.destination);
-      loadPromise = Promise.all(VOICES.map(v =>
-        fetch(SAMPLE_BASE + 'samples/' + v.file)
-          .then(r => { if (!r.ok) throw new Error(v.file + ' HTTP ' + r.status); return r.arrayBuffer(); })
-          .then(ab => ctx.decodeAudioData(ab))
-          .then(buf => { buffers[v.id] = buf; })
+      loadPromise = prefetchSamples().then(pairs => Promise.all(
+        pairs.map(([id, ab]) => ctx.decodeAudioData(ab).then(buf => { buffers[id] = buf; }))
       ));
     }
     if (ctx.state === 'suspended') ctx.resume();
@@ -580,6 +589,7 @@
     const root = document.getElementById('tr909-root');
     if (!root) { console.error('TR-909: #tr909-root not found'); return; }
     build(root);
+    prefetchSamples();   // warm the sample cache so the first START is instant
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
