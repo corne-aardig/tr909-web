@@ -7,9 +7,9 @@ working knobs (tune, decay, tone, snappy, attack, levels) driven by Web Audio DS
 Live on the drumcomputer Webflow site; embedded via jsDelivr:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/corne-aardig/tr909-web@1/tr909.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/corne-aardig/tr909-web@1.0.1/tr909.css">
 <div id="tr909-root"></div>
-<script src="https://cdn.jsdelivr.net/gh/corne-aardig/tr909-web@1/tr909.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/corne-aardig/tr909-web@1.0.1/tr909.js" defer></script>
 ```
 
 Local dev: serve this folder over HTTP (`python3 -m http.server`) and open `index.html`.
